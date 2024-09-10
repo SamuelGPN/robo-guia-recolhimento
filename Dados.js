@@ -1,7 +1,7 @@
 const XLSX = require("xlsx");
 
 const workbook = XLSX.readFile(
-  "C:\\Users\\Samuel\\Documents\\Projeto JS\\Robo\\Projeto_Robo\\testerobo.xltx"
+  "C:\\Users\\Samuel\\Documents\\Projeto JS\\Robo\\Projeto_Robo\\GUIAS COBEX ATT.xlsx"
 );
 const sheetName = workbook.SheetNames[0]; // Nome da primeira aba
 const sheet = workbook.Sheets[sheetName]; //sheet é aba

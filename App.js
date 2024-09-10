@@ -10,7 +10,7 @@ const { RETRY_DELAY } = require("puppeteer");
 
 
 (async () => {
-  const browser = await puppeteer.launch({ headless: false, slowMo: 0 });
+  const browser = await puppeteer.launch({ headless: false, slowMo: 0});
   const page = await browser.newPage();
   await page.goto("https://www45.bb.com.br/fmc/frm/fw0707314_1.jsp#");
   //for (let n = 0; n <= teste.numLinhas(); n++) {
@@ -22,11 +22,13 @@ const { RETRY_DELAY } = require("puppeteer");
   for (let a = 1; a < numRows; a++) {
     //Cada repetição ele 'pula' de linha
     let NumProc = data[a][4] // Numero do processo que sera salvo o pdf, coluna 5 que no arry é 4
+    let NumProcUnic = data[a][10]
     console.log(NumProc)
 
     await page.goto("https://www45.bb.com.br/fmc/frm/fw0707314_1.jsp#"); //Site da Guia de recolhimento
 
-    for (let b = 0; b < numCols; b++) {
+    // O numCols -2 é pq terá duas coluna a mais com o numero do Processo unico
+    for (let b = 0; b < numCols -2; b++) {
       //Cada repetição ele 'pula' de coluna
       let celulas = data[a][b];
       let input = inputs.dado(b);
@@ -57,19 +59,38 @@ const { RETRY_DELAY } = require("puppeteer");
             );            
           }
         }, input, celulas ); //ao final da chamada de page.evaluate para garantir que essas variáveis sejam passadas para o contexto da página.
+      }else if(input == 'textarea[name="area1"]'){
+        await page.click(`${input}`)
+        await page.type(`${input}`, `${data[a][b+4]} \n\n${data[a][b-7]} X ${celulas} \n\nGUIA DESARQUIVAMENTO`)
+
       }else{
         await page.click(`${input}`);
         await page.type(`${input}`, `${celulas}`);
       }
+      
     }
+    console.log('quase')
     await page.keyboard.press("Tab");
     await page.click('input[name="Pb"]');
 
     console.log('ainda não!!!')
     //await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 20000 }); //Quando o slowMo estiver 0 recomendado
     await delay(1000)
+
+    // Injetar texto azul no corpo da página
+    await page.evaluate((NumProcUnic) => {
+      console.log('NumProcUnic dentro do evaluate:', NumProcUnic); // Verifique se NumProcUnic está disponível
+      const tbody = document.querySelectorAll('tbody')[1]; // Seleciona o primeiro <tbody> encontrado
+      
+      const h3 = document.createElement('h3'); // Cria uma nova célula
+      h3.style.color = 'blue'; // Define a cor do texto como azul
+      h3.textContent = NumProcUnic; // Define o texto da célula
+      tbody.appendChild(h3); // Adiciona a linha ao <tbody>
+
+    },NumProcUnic);
+
     console.log('passou do fornavigation!!!')
-    const savePath = `C:/Users/Samuel/Documents/Projeto JS/Robo/Guias/${NumProc}-guia.pdf`; //Local onde o pdf será salvo
+    const savePath = `C:/Users/Samuel/Documents/Projeto JS/Robo/Guias/${NumProcUnic}.pdf`; //Local onde o pdf será salvo
     console.log('quaseeee!!!')
     await page.pdf({
       path: savePath, // Nome do arquivo PDF
@@ -78,5 +99,6 @@ const { RETRY_DELAY } = require("puppeteer");
     });
     console.log('passsouuuu!!!')
 
-  }  
+  } 
+  await browser.close();
 })();
