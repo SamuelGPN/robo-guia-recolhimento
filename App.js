@@ -27,8 +27,8 @@ const { RETRY_DELAY } = require("puppeteer");
 
     await page.goto("https://www45.bb.com.br/fmc/frm/fw0707314_1.jsp#"); //Site da Guia de recolhimento
 
-    // O numCols -2 é pq terá duas coluna a mais com o numero do Processo unico
-    for (let b = 0; b < numCols -2; b++) {
+    // O numCols -3 é pq terá duas coluna a mais com o numero do Processo unico
+    for (let b = 0; b < numCols -3; b++) {
       //Cada repetição ele 'pula' de coluna
       let celulas = data[a][b];
       let input = inputs.dado(b);
@@ -50,7 +50,7 @@ const { RETRY_DELAY } = require("puppeteer");
               el.getAttribute("onclick") &&
               el.getAttribute("onclick").includes("mshowDropDown") &&
               el.getAttribute("onclick").includes(celulas) // Adicionar o this
-          );
+          )
           if (element) {
             element.click();
           } else {
@@ -61,7 +61,7 @@ const { RETRY_DELAY } = require("puppeteer");
         }, input, celulas ); //ao final da chamada de page.evaluate para garantir que essas variáveis sejam passadas para o contexto da página.
       }else if(input == 'textarea[name="area1"]'){
         await page.click(`${input}`)
-        await page.type(`${input}`, `${data[a][b+4]} \n\n${data[a][b-7]} X ${celulas} \n\nGUIA DESARQUIVAMENTO`)
+        await page.type(`${input}`, `${data[a][b+4]} \n\n${data[a][b+5]} X ${celulas} \n\nGUIA DESARQUIVAMENTO`)
 
       }else{
         await page.click(`${input}`);
